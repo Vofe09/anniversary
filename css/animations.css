@@ -91,5 +91,11 @@
             0 0 18px rgba(255,170,205,.25),
             0 0 40px rgba(255,120,170,.10);
     }
+        
 
+}
+@keyframes CaretBlink {
+    50% {
+        opacity: 0;
+    }
 }
