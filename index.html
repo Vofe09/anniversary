@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My beloved woman</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+<section id="Stage1" class="Stage StageVisible" aria-label="Intro stage">
+  <div class="BlurOverlay"></div>
+  <div class="NoiseOverlay"></div>
+  <div class="AmbientLight AmbientLight1"></div>
+  <div class="AmbientLight AmbientLight2"></div>
+  <div class="AmbientLight AmbientLight3"></div>
+
+  <button id="OpenButton" class="OpenButton" type="button" aria-label="Open the site">
+    Open?
+  </button>
+</section>
+
+<section id="Stage2" class="Stage StageHidden" aria-hidden="true">
+  <div class="Stage2Overlay"></div>
+
+  <button id="EnvelopeButton" class="EnvelopeButton" type="button" aria-label="Open the envelope">
+    <img
+      id="EnvelopeSprite"
+      class="EnvelopeSprite"
+      src="assets/images/envelope-closed.png"
+      alt="Closed envelope"
+      draggable="false"
+    />
+  </button>
+
+  <div id="StageHint" class="StageHint">Tap to open</div>
+</section>
+
+<script src="js/main.js"></script>
+<script src="js/stage2.js"></script>

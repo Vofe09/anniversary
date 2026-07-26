@@ -1,0 +1,466 @@
+:root {
+    /* ===== Color Palette ===== */
+
+    --BgPrimary: #14090E;
+    --BgSecondary: #261017;
+    --BgAccent: #3A1724;
+
+    --PinkLight: #F8DCE7;
+    --Pink: #EAA8BF;
+    --Rose: #C86A8C;
+
+    --White: #FFF8FB;
+
+    --GlowStrong: rgba(255, 220, 235, 0.8);
+    --GlowMedium: rgba(255, 170, 205, 0.45);
+    --GlowSoft: rgba(255, 120, 170, 0.18);
+
+    --Overlay: rgba(20, 9, 14, 0.35);
+
+    --TransitionSpeed: 900ms;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background: var(--BgPrimary);
+}
+
+body {
+    cursor: pointer;
+}
+
+#App {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* ========================================================= */
+/*                           STAGES                          */
+/* ========================================================= */
+
+.Stage {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    transition:
+        opacity var(--TransitionSpeed) ease,
+        transform var(--TransitionSpeed) ease;
+}
+
+.StageVisible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.StageHidden {
+    opacity: 0;
+    transform: scale(1.02);
+    pointer-events: none;
+}
+
+/* ========================================================= */
+/*                         STAGE 1                           */
+/* ========================================================= */
+
+#Stage1 {
+
+    display: grid;
+    place-items: center;
+
+    position: relative;
+    overflow: hidden;
+
+    background:
+
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(255, 180, 210, 0.08),
+            transparent 42%
+        ),
+
+        radial-gradient(
+            circle at 80% 90%,
+            rgba(255, 120, 170, 0.05),
+            transparent 50%
+        ),
+
+        linear-gradient(
+            180deg,
+            var(--BgSecondary) 0%,
+            var(--BgPrimary) 100%
+        );
+
+    isolation: isolate;
+}
+
+/* ========================================================= */
+/*                       BACKGROUND FX                       */
+/* ========================================================= */
+
+.BlurOverlay {
+
+    position: absolute;
+    inset: 0;
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    background: var(--Overlay);
+}
+
+.NoiseOverlay {
+
+    position: absolute;
+    inset: 0;
+
+    opacity: .035;
+
+    background-image:
+
+        linear-gradient(
+            rgba(255,255,255,.4) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.4) 1px,
+            transparent 1px
+        );
+
+    background-size: 3px 3px;
+
+    mix-blend-mode: soft-light;
+
+    pointer-events: none;
+}
+
+/* ========================================================= */
+/*                         OPEN TEXT                         */
+/* ========================================================= */
+
+.OpenButton {
+
+    position: relative;
+    z-index: 10;
+
+    border: none;
+    background: transparent;
+
+    color: var(--White);
+
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-weight: 600;
+    letter-spacing: .08em;
+
+    cursor: pointer;
+
+    user-select: none;
+
+    animation: GlowPulse 2.8s ease-in-out infinite;
+
+    text-shadow:
+
+        0 0 10px var(--GlowStrong),
+        0 0 24px var(--GlowMedium),
+        0 0 50px var(--GlowSoft);
+}
+
+.OpenButton:focus-visible {
+
+    outline: 2px solid var(--Pink);
+
+    outline-offset: 12px;
+
+    border-radius: 12px;
+}
+
+/* ========================================================= */
+/*                       ANIMATIONS                          */
+/* ========================================================= */
+
+
+
+/* ========================================================= */
+/*                      EXIT ANIMATION                       */
+/* ========================================================= */
+
+#Stage1.StageExiting {
+
+    opacity: 0;
+
+    transform: scale(1.03);
+}
+
+
+/* ========================================================= */
+/*                     AMBIENT LIGHTING                      */
+/* ========================================================= */
+
+.AmbientLight {
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    filter: blur(120px);
+
+    pointer-events: none;
+
+    mix-blend-mode: screen;
+
+    opacity: .22;
+
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+.AmbientLight1 {
+
+    width: 650px;
+    height: 650px;
+
+    background: rgba(255, 170, 205, .30);
+
+    top: -180px;
+    left: -180px;
+
+    animation: FloatLightOne 18s infinite alternate ease-in-out;
+}
+
+.AmbientLight2 {
+
+    width: 500px;
+    height: 500px;
+
+    background: rgba(200, 106, 140, .22);
+
+    bottom: -140px;
+    right: -120px;
+
+    animation: FloatLightTwo 22s infinite alternate ease-in-out;
+}
+
+.AmbientLight3 {
+
+    width: 420px;
+    height: 420px;
+
+    background: rgba(255, 210, 225, .16);
+
+    top: 45%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    animation: FloatLightThree 25s infinite alternate ease-in-out;
+}
+
+#Stage2 {
+    display: grid;
+    place-items: center;
+    position: relative;
+    overflow: hidden;
+
+    background:
+        radial-gradient(circle at 50% 40%, rgba(255, 180, 210, 0.08), transparent 38%),
+        radial-gradient(circle at 70% 80%, rgba(200, 106, 140, 0.08), transparent 45%),
+        linear-gradient(180deg, var(--BgSecondary) 0%, var(--BgPrimary) 100%);
+}
+
+.Stage2Backdrop {
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(20, 9, 14, 0.18);
+}
+
+.EnvelopeButton {
+    position: relative;
+    z-index: 2;
+
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+
+    transform: scale(0.92);
+    transition: transform 280ms ease, filter 280ms ease, opacity 280ms ease;
+    filter: drop-shadow(0 0 26px rgba(255, 170, 205, 0.22));
+}
+
+.EnvelopeButton:hover {
+    transform: scale(0.96);
+    filter: drop-shadow(0 0 36px rgba(255, 170, 205, 0.34));
+}
+
+.EnvelopeButton:active {
+    transform: scale(0.90);
+}
+
+.EnvelopeSprite {
+    display: block;
+    width: min(72vw, 420px);
+    height: auto;
+    user-select: none;
+    pointer-events: none;
+}
+
+.StageHint {
+    position: absolute;
+    left: 50%;
+    bottom: 8vh;
+    transform: translateX(-50%);
+    z-index: 2;
+
+    color: var(--PinkLight);
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.72;
+    text-shadow: 0 0 18px rgba(255, 170, 205, 0.24);
+    transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.StageHidden .StageHint {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+}
+
+#App {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 50% 35%, rgba(255, 180, 210, 0.08), transparent 42%),
+        radial-gradient(circle at 80% 90%, rgba(255, 120, 170, 0.05), transparent 50%),
+        linear-gradient(180deg, var(--BgSecondary) 0%, var(--BgPrimary) 100%);
+}
+
+.Stage {
+    background: transparent;
+}
+
+/* ========================================================= */
+/*                           STAGE 2                         */
+/* ========================================================= */
+
+#Stage2 {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.Stage2Overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 42%, rgba(255, 180, 210, 0.05), transparent 34%),
+        radial-gradient(circle at 65% 78%, rgba(200, 106, 140, 0.06), transparent 40%),
+        rgba(20, 9, 14, 0.08);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.EnvelopeButton {
+    position: relative;
+    z-index: 2;
+
+    border: none;
+    background: transparent;
+    padding: 0;
+
+    cursor: pointer;
+    outline: none;
+
+    transform: translateY(10px) scale(0.86);
+    opacity: 0;
+
+    transition:
+        transform 420ms ease,
+        opacity 420ms ease,
+        filter 420ms ease;
+    filter: drop-shadow(0 0 26px rgba(255, 170, 205, 0.20));
+}
+
+#Stage2.StageVisible .EnvelopeButton {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.EnvelopeButton:hover {
+    transform: translateY(-2px) scale(1.03);
+    filter: drop-shadow(0 0 38px rgba(255, 170, 205, 0.34));
+}
+
+.EnvelopeButton:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+.EnvelopeSprite {
+    display: block;
+    width: min(72vw, 420px);
+    height: auto;
+    user-select: none;
+    pointer-events: none;
+}
+
+.StageHint {
+    position: absolute;
+    left: 50%;
+    bottom: 8vh;
+    transform: translateX(-50%);
+    z-index: 2;
+
+    color: var(--PinkLight);
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.74;
+    text-shadow: 0 0 18px rgba(255, 170, 205, 0.24);
+    transition: opacity 300ms ease, transform 300ms ease;
+    user-select: none;
+    pointer-events: none;
+}
+
+#Stage2.StageHidden .StageHint {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+}
+
+#Stage2.StageExiting {
+    opacity: 0;
+    transform: scale(1.02);
+    transition:
+        opacity 700ms ease,
+        transform 700ms ease;
+}

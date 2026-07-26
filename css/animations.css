@@ -1,0 +1,95 @@
+@keyframes FloatLightOne {
+
+    from {
+
+        transform:
+            translate(0px, 0px)
+            scale(1);
+    }
+
+    to {
+
+        transform:
+            translate(120px, 70px)
+            scale(1.18);
+    }
+
+}
+
+@keyframes FloatLightTwo {
+
+    from {
+
+        transform:
+            translate(0px, 0px)
+            scale(1);
+    }
+
+    to {
+
+        transform:
+            translate(-90px, -80px)
+            scale(1.15);
+    }
+
+}
+
+@keyframes FloatLightThree {
+
+    from {
+
+        transform:
+            translate(-50%, -50%)
+            scale(1);
+    }
+
+    to {
+
+        transform:
+            translate(calc(-50% + 45px), calc(-50% - 35px))
+            scale(1.25);
+    }
+
+}
+@keyframes GlowPulse {
+
+    0% {
+
+        transform: scale(1);
+
+        opacity: .88;
+
+        text-shadow:
+
+            0 0 8px rgba(255,220,235,.45),
+            0 0 18px rgba(255,170,205,.25),
+            0 0 40px rgba(255,120,170,.10);
+    }
+
+    50% {
+
+        transform: scale(1.035);
+
+        opacity: 1;
+
+        text-shadow:
+
+            0 0 12px rgba(255,235,245,.95),
+            0 0 32px rgba(255,185,220,.60),
+            0 0 70px rgba(255,120,170,.25);
+    }
+
+    100% {
+
+        transform: scale(1);
+
+        opacity: .88;
+
+        text-shadow:
+
+            0 0 8px rgba(255,220,235,.45),
+            0 0 18px rgba(255,170,205,.25),
+            0 0 40px rgba(255,120,170,.10);
+    }
+
+}
