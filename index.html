@@ -38,5 +38,82 @@
   <div id="StageHint" class="StageHint">Tap to open</div>
 </section>
 
+<section id="Stage4" class="Stage StageHidden" aria-hidden="true">
+  <div class="Stage4Backdrop"></div>
+
+  <div class="Stage4Slides">
+    <article class="Stage4Slide Stage4SlideActive" data-slide="0">
+      <div class="Stage4Card">
+        <div class="Stage4Label">01</div>
+        <h2 class="Stage4Title">Вместе мы уже</h2>
+
+        <div class="Stage4Counter">
+          <div><span id="DaysCount">0</span> дней</div>
+          <div><span id="MinutesCount">0</span> минут</div>
+          <div><span id="SecondsCount">0</span> секунд</div>
+        </div>
+
+        <p class="Stage4Text">
+          Самое лучшее время в моей жизни, это время проведенное с тобой
+        </p>
+      </div>
+    </article>
+
+    <article class="Stage4Slide" data-slide="1">
+      <div class="Stage4Card">
+        <div class="Stage4Label">02</div>
+        <h2 class="Stage4Title">Ты была моей первой мыслью</h2>
+
+        <div class="Stage4Counter Stage4CounterTwo">
+          <div><span id="MorningThoughtsCount">0</span> утра</div>
+          <div><span id="NightThoughtsCount">0</span> перед сном</div>
+        </div>
+
+        <p class="Stage4Text">
+          А это значит, что ты была моей первой мыслью по утрам и последней мыслью перед сном.
+        </p>
+      </div>
+    </article>
+
+    <article class="Stage4Slide" data-slide="2">
+      <div class="Stage4Card">
+        <div class="Stage4Label">03</div>
+        <h2 class="Stage4Title">Треки, которые напоминают о тебе</h2>
+
+        <div class="Stage4Tracks">
+          <button class="Stage4TrackButton" type="button" data-track="0">
+            <img src="assets/images/track-1.jpg" alt="Track 1" />
+          </button>
+
+          <button class="Stage4TrackButton" type="button" data-track="1">
+            <img src="assets/images/track-2.jpg" alt="Track 2" />
+          </button>
+
+          <button class="Stage4TrackButton" type="button" data-track="2">
+            <img src="assets/images/track-3.jpg" alt="Track 3" />
+          </button>
+        </div>
+
+        <p class="Stage4Text">
+          Когда я думаю о тебе, в голове у меня сразу всплывают эти треки.
+        </p>
+      </div>
+    </article>
+  </div>
+
+  <div class="Stage4Hint">Tap to continue</div>
+
+  <audio id="RomanticAudio" loop preload="auto">
+    <source src="assets/audio/romantic-bg.mp3" type="audio/mpeg" />
+  </audio>
+<!-- 
+  <audio id="TrackAudio" preload="auto">
+    <source src="" type="audio/mpeg" />
+  </audio> -->
+</section>
+
 <script src="js/main.js"></script>
 <script src="js/stage2.js"></script>
+<script src="js/stage4.js"></script>
+</body>
+</html>

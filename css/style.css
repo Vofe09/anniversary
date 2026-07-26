@@ -69,16 +69,22 @@ body {
         transform var(--TransitionSpeed) ease;
 }
 
-.StageVisible {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
+.Stage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .StageHidden {
-    opacity: 0;
-    transform: scale(1.02);
-    pointer-events: none;
+    display: none !important;
+}
+
+.StageVisible {
+    display: grid !important;
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
 }
 
 /* ========================================================= */
@@ -549,4 +555,165 @@ body {
     text-shadow:
         0 0 10px rgba(255, 220, 235, 0.68),
         0 0 24px rgba(255, 170, 205, 0.34);
+}
+
+#Stage4 {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.Stage4Backdrop {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 30%, rgba(255, 180, 210, 0.10), transparent 34%),
+        radial-gradient(circle at 70% 80%, rgba(200, 106, 140, 0.12), transparent 42%),
+        linear-gradient(180deg, var(--BgSecondary) 0%, var(--BgPrimary) 100%);
+}
+
+.Stage4Slides {
+    position: relative;
+    width: min(92vw, 980px);
+    height: min(78vh, 760px);
+    z-index: 2;
+}
+
+.Stage4Slide {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transform: translateX(40px) scale(0.98);
+    pointer-events: none;
+    transition: opacity 520ms ease, transform 520ms ease;
+}
+
+.Stage4SlideActive {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+}
+
+.Stage4SlideExitLeft {
+    opacity: 0;
+    transform: translateX(-40px) scale(0.98);
+}
+
+.Stage4SlideEnterRight {
+    opacity: 0;
+    transform: translateX(40px) scale(0.98);
+}
+
+.Stage4Card {
+    width: min(92vw, 760px);
+    min-height: min(62vh, 620px);
+    padding: 34px 28px;
+    border-radius: 28px;
+    background: rgba(20, 9, 14, 0.28);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.28),
+        0 0 42px rgba(255, 170, 205, 0.08);
+    border: 1px solid rgba(255, 220, 235, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 18px;
+}
+
+.Stage4Label {
+    color: var(--Pink);
+    letter-spacing: 0.22em;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+.Stage4Title {
+    margin: 0;
+    color: var(--White);
+    font-size: clamp(2rem, 4.4vw, 4rem);
+    line-height: 1.04;
+    text-shadow:
+        0 0 10px rgba(255, 220, 235, 0.45),
+        0 0 24px rgba(255, 170, 205, 0.18);
+}
+
+.Stage4Text {
+    margin: 0;
+    max-width: 54ch;
+    color: var(--PinkLight);
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    line-height: 1.7;
+    text-shadow: 0 0 12px rgba(255, 220, 235, 0.18);
+}
+
+.Stage4Counter {
+    display: grid;
+    gap: 8px;
+    color: var(--PinkLight);
+    font-size: clamp(1.2rem, 2.6vw, 2rem);
+    line-height: 1.25;
+}
+
+.Stage4Counter span {
+    color: var(--White);
+    text-shadow:
+        0 0 10px rgba(255, 220, 235, 0.45),
+        0 0 20px rgba(255, 170, 205, 0.22);
+}
+
+.Stage4CounterTwo {
+    grid-template-columns: 1fr;
+}
+
+.Stage4Tracks {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.Stage4TrackButton {
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 18px;
+    overflow: hidden;
+    transform: translateY(0) scale(1);
+    transition: transform 220ms ease, filter 220ms ease, opacity 220ms ease;
+    filter: drop-shadow(0 0 18px rgba(255, 170, 205, 0.12));
+}
+
+.Stage4TrackButton:hover {
+    transform: translateY(-2px) scale(1.02);
+    filter: drop-shadow(0 0 28px rgba(255, 170, 205, 0.22));
+}
+
+.Stage4TrackButton img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.Stage4Hint {
+    position: absolute;
+    left: 50%;
+    bottom: 6vh;
+    transform: translateX(-50%);
+    z-index: 2;
+    color: var(--PinkLight);
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.72;
+    pointer-events: none;
 }

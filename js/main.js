@@ -32,3 +32,11 @@ document.addEventListener("keydown", (event) => {
         GoToNextStage();
     }
 });
+
+document.addEventListener("click", () => {
+    console.log("document click");
+}, true);
+
+OpenButton.addEventListener("click", () => {
+    console.log("button click");
+});

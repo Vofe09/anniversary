@@ -201,8 +201,8 @@ function ExitStage2() {
 
         window.dispatchEvent(new CustomEvent("stage2complete"));
 
-        if (typeof window.EnterStage3 === "function") {
-            window.EnterStage3();
+        if (typeof window.EnterStage4=== "function") {
+            window.EnterStage4();
         }
     }, 700);
 }
