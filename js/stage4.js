@@ -8,12 +8,17 @@ const NightThoughtsCount = document.getElementById("NightThoughtsCount");
 const RomanticAudio = document.getElementById("RomanticAudio");
 const TrackAudio = document.getElementById("TrackAudio");
 const TrackButtons = Array.from(document.querySelectorAll(".Stage4TrackButton"));
+const Stage4Tracks = document.querySelector(".Stage4Tracks");
 
 const Stage4Settings = {
     StartDate: new Date("2025-08-01T00:00:00+05:00"),
-    SlideTransitionMs: 520,
+    StageFadeInMs: 780,
+    SlideTransitionMs: 560,
+    TypewriterTitleDelayMs: 70,
+    TypewriterBodyDelayMs: 70,
+    TypewriterStartDelayMs: 200,
+    TypewriterHoldMs: 180,
     MusicFadeStepMs: 50,
-    MusicFadeStepAmount: 0.05,
     TrackFadeOutMs: 1200,
     TrackFadeInMs: 1000,
     BackgroundMusicVolume: 0.65
@@ -37,38 +42,46 @@ const TrackList = [
 let CurrentSlideIndex = 0;
 let IsTransitioning = false;
 let CurrentFadeTimerId = null;
-let CurrentTrackIndex = null;
 let HasStage4Started = false;
 let HasBackgroundMusicStarted = false;
+let CurrentTypewriterSessionId = 0;
+let IsTypingCurrentSlide = false;
 
-function PadTwo(value) {
-    return String(value).padStart(2, "0");
+function Wait(Milliseconds) {
+    return new Promise((Resolve) => window.setTimeout(Resolve, Milliseconds));
+}
+
+function GetTypingDelay(Character, BaseDelayMs) {
+    if (Character === " ") return Math.max(8, Math.round(BaseDelayMs * 0.35));
+    if (Character === "\n") return Math.max(12, Math.round(BaseDelayMs * 0.8));
+    if (/[,.!?…:;]/.test(Character)) return Math.max(60, Math.round(BaseDelayMs * 4));
+    return Math.max(12, Math.round(BaseDelayMs * (0.9 + Math.random() * 0.2)));
 }
 
 function GetTimeSinceStart() {
-    const now = new Date();
-    const diffMs = Math.max(0, now - Stage4Settings.StartDate);
+    const Now = new Date();
+    const DiffMs = Math.max(0, Now - Stage4Settings.StartDate);
 
-    const totalSeconds = Math.floor(diffMs / 1000);
-    const totalMinutes = Math.floor(totalSeconds / 60);
-    const totalDays = Math.floor(totalMinutes / 1440);
+    const TotalSeconds = Math.floor(DiffMs / 1000);
+    const TotalMinutes = Math.floor(TotalSeconds / 60);
+    const TotalDays = Math.floor(TotalMinutes / 1440);
 
     return {
-        days: totalDays,
-        minutes: totalMinutes,
-        seconds: totalSeconds
+        days: TotalDays,
+        minutes: TotalMinutes,
+        seconds: TotalSeconds
     };
 }
 
 function UpdateCounters() {
-    const timeSinceStart = GetTimeSinceStart();
+    const TimeSinceStart = GetTimeSinceStart();
 
-    DaysCount.textContent = timeSinceStart.days.toLocaleString("en-US");
-    MinutesCount.textContent = timeSinceStart.minutes.toLocaleString("en-US");
-    SecondsCount.textContent = timeSinceStart.seconds.toLocaleString("en-US");
+    DaysCount.textContent = TimeSinceStart.days.toLocaleString("en-US");
+    MinutesCount.textContent = TimeSinceStart.minutes.toLocaleString("en-US");
+    SecondsCount.textContent = TimeSinceStart.seconds.toLocaleString("en-US");
 
-    MorningThoughtsCount.textContent = Math.max(0, timeSinceStart.days - 1).toLocaleString("en-US");
-    NightThoughtsCount.textContent = timeSinceStart.days.toLocaleString("en-US");
+    MorningThoughtsCount.textContent = Math.max(0, TimeSinceStart.days - 1).toLocaleString("en-US");
+    NightThoughtsCount.textContent = TimeSinceStart.days.toLocaleString("en-US");
 }
 
 function StartCounterLoop() {
@@ -76,57 +89,207 @@ function StartCounterLoop() {
     window.setInterval(UpdateCounters, 1000);
 }
 
-function ShowSlide(nextSlideIndex) {
-    if (IsTransitioning || nextSlideIndex === CurrentSlideIndex) return;
+function InitializeTypewriterTargets() {
+    Stage4Slides.forEach((Slide) => {
+        Slide.querySelectorAll(".Stage4Title, .Stage4Text").forEach((Element) => {
+            if (!Element.dataset.fullText) {
+                Element.dataset.fullText = Element.textContent.trim();
+            }
 
-    const currentSlide = Stage4Slides[CurrentSlideIndex];
-    const nextSlide = Stage4Slides[nextSlideIndex];
+            Element.textContent = "";
+            Element.classList.add("Stage4Typewriter");
+            Element.classList.remove("Stage4Typing", "Stage4Typed");
+        });
+    });
+}
+
+function ResetSlideForTyping(SlideIndex) {
+    const Slide = Stage4Slides[SlideIndex];
+    if (!Slide) return;
+
+    Slide.querySelectorAll(".Stage4Title, .Stage4Text").forEach((Element) => {
+        const FullText = Element.dataset.fullText || Element.textContent.trim();
+
+        Element.dataset.fullText = FullText;
+        Element.textContent = "";
+        Element.classList.add("Stage4Typewriter");
+        Element.classList.remove("Stage4Typing", "Stage4Typed");
+    });
+
+    if (SlideIndex !== 2 && Stage4Tracks) {
+        Stage4Tracks.classList.remove("Stage4TracksVisible");
+    }
+}
+
+function SkipCurrentTyping() {
+    CurrentTypewriterSessionId += 1;
+    IsTypingCurrentSlide = false;
+
+    const Slide = Stage4Slides[CurrentSlideIndex];
+    if (!Slide) return;
+
+    Slide.querySelectorAll(".Stage4Title, .Stage4Text").forEach((Element) => {
+        const FullText = Element.dataset.fullText || "";
+        Element.textContent = FullText;
+        Element.classList.remove("Stage4Typing");
+        Element.classList.add("Stage4Typed");
+    });
+
+    if (CurrentSlideIndex === 2 && Stage4Tracks) {
+        Stage4Tracks.classList.add("Stage4TracksVisible");
+    }
+}
+
+async function AnimateTyping(Element, FullText, SessionId, Options = {}) {
+    const BaseDelayMs = Options.baseDelayMs ?? 24;
+    const StartDelayMs = Options.startDelayMs ?? 0;
+    const HoldDelayMs = Options.holdDelayMs ?? 0;
+
+    Element.classList.add("Stage4Typewriter", "Stage4Typing");
+    Element.classList.remove("Stage4Typed");
+    Element.textContent = "";
+
+    if (StartDelayMs > 0) {
+        await Wait(StartDelayMs);
+    }
+
+    if (SessionId !== CurrentTypewriterSessionId) return false;
+
+    for (let Index = 0; Index < FullText.length; Index += 1) {
+        if (SessionId !== CurrentTypewriterSessionId) return false;
+
+        const Character = FullText[Index];
+        Element.textContent += Character;
+
+        await Wait(GetTypingDelay(Character, BaseDelayMs));
+    }
+
+    if (SessionId !== CurrentTypewriterSessionId) return false;
+
+    Element.classList.remove("Stage4Typing");
+    Element.classList.add("Stage4Typed");
+
+    if (HoldDelayMs > 0) {
+        await Wait(HoldDelayMs);
+    }
+
+    return SessionId === CurrentTypewriterSessionId;
+}
+
+async function TypeSlideContent(SlideIndex) {
+    const SessionId = ++CurrentTypewriterSessionId;
+    IsTypingCurrentSlide = true;
+
+    const Slide = Stage4Slides[SlideIndex];
+    if (!Slide) {
+        IsTypingCurrentSlide = false;
+        return;
+    }
+
+    const TitleElement = Slide.querySelector(".Stage4Title");
+    const TextElement = Slide.querySelector(".Stage4Text");
+
+    const Targets = [
+        {
+            element: TitleElement,
+            baseDelayMs: Stage4Settings.TypewriterTitleDelayMs,
+            startDelayMs: 120,
+            holdDelayMs: 120
+        },
+        {
+            element: TextElement,
+            baseDelayMs: Stage4Settings.TypewriterBodyDelayMs,
+            startDelayMs: Stage4Settings.TypewriterStartDelayMs,
+            holdDelayMs: Stage4Settings.TypewriterHoldMs
+        }
+    ].filter((Target) => Target.element);
+
+    for (const Target of Targets) {
+        const FullText = Target.element.dataset.fullText || "";
+        const DidFinish = await AnimateTyping(Target.element, FullText, SessionId, Target);
+
+        if (!DidFinish) {
+            IsTypingCurrentSlide = false;
+            return;
+        }
+    }
+
+    if (SessionId !== CurrentTypewriterSessionId) {
+        IsTypingCurrentSlide = false;
+        return;
+    }
+
+    IsTypingCurrentSlide = false;
+
+    if (SlideIndex === 2 && Stage4Tracks) {
+        Stage4Tracks.classList.add("Stage4TracksVisible");
+    }
+}
+
+function ShowSlide(NextSlideIndex) {
+    if (IsTransitioning || NextSlideIndex === CurrentSlideIndex) return;
+
+    const CurrentSlide = Stage4Slides[CurrentSlideIndex];
+    const NextSlide = Stage4Slides[NextSlideIndex];
+
+    if (!CurrentSlide || !NextSlide) return;
 
     IsTransitioning = true;
+    CurrentTypewriterSessionId += 1;
+    IsTypingCurrentSlide = false;
 
-    currentSlide.classList.remove("Stage4SlideActive");
-    currentSlide.classList.add("Stage4SlideExitLeft");
+    CurrentSlide.classList.remove("Stage4SlideActive");
+    CurrentSlide.classList.add("Stage4SlideExitLeft");
 
-    nextSlide.classList.remove("Stage4SlideEnterRight");
-    nextSlide.classList.add("Stage4SlideActive");
+    ResetSlideForTyping(NextSlideIndex);
+
+    NextSlide.classList.add("Stage4SlideEnterRight");
+    NextSlide.classList.add("Stage4SlideActive");
+
+    window.requestAnimationFrame(() => {
+        NextSlide.classList.remove("Stage4SlideEnterRight");
+    });
 
     window.setTimeout(() => {
-        currentSlide.classList.remove("Stage4SlideExitLeft");
-        nextSlide.classList.remove("Stage4SlideEnterRight");
-        CurrentSlideIndex = nextSlideIndex;
+        CurrentSlide.classList.remove("Stage4SlideExitLeft");
+        CurrentSlide.classList.remove("Stage4SlideActive");
+
+        CurrentSlideIndex = NextSlideIndex;
         IsTransitioning = false;
+
+        TypeSlideContent(NextSlideIndex);
     }, Stage4Settings.SlideTransitionMs);
 }
 
 function GoToNextSlide() {
-    const nextSlideIndex = CurrentSlideIndex + 1;
-    if (nextSlideIndex >= Stage4Slides.length) return;
+    const NextSlideIndex = CurrentSlideIndex + 1;
+    if (NextSlideIndex >= Stage4Slides.length) return;
 
-    ShowSlide(nextSlideIndex);
+    ShowSlide(NextSlideIndex);
 }
 
-function FadeAudio(audioElement, targetVolume, durationMs, onComplete) {
-    if (!audioElement) return;
+function FadeAudio(AudioElement, TargetVolume, DurationMs, OnComplete) {
+    if (!AudioElement) return;
 
     if (CurrentFadeTimerId !== null) {
         clearInterval(CurrentFadeTimerId);
         CurrentFadeTimerId = null;
     }
 
-    const startVolume = audioElement.volume;
-    const steps = Math.max(1, Math.floor(durationMs / Stage4Settings.MusicFadeStepMs));
-    const volumeStep = (targetVolume - startVolume) / steps;
-    let stepIndex = 0;
+    const StartVolume = AudioElement.volume;
+    const Steps = Math.max(1, Math.floor(DurationMs / Stage4Settings.MusicFadeStepMs));
+    const VolumeStep = (TargetVolume - StartVolume) / Steps;
+    let StepIndex = 0;
 
     CurrentFadeTimerId = window.setInterval(() => {
-        stepIndex += 1;
-        audioElement.volume = Math.min(1, Math.max(0, audioElement.volume + volumeStep));
+        StepIndex += 1;
+        AudioElement.volume = Math.min(1, Math.max(0, AudioElement.volume + VolumeStep));
 
-        if (stepIndex >= steps) {
+        if (StepIndex >= Steps) {
             clearInterval(CurrentFadeTimerId);
             CurrentFadeTimerId = null;
-            audioElement.volume = targetVolume;
-            onComplete?.();
+            AudioElement.volume = TargetVolume;
+            OnComplete?.();
         }
     }, Stage4Settings.MusicFadeStepMs);
 }
@@ -146,21 +309,21 @@ async function PlayBackgroundMusic() {
     }
 }
 
-async function PlayTrack(trackIndex) {
-    const track = TrackList[trackIndex];
-    if (!track) return;
-
-    CurrentTrackIndex = trackIndex;
+async function PlayTrack(TrackIndex) {
+    const Track = TrackList[TrackIndex];
+    if (!Track) return;
 
     try {
         TrackAudio.pause();
-        TrackAudio.src = track.src;
+        TrackAudio.src = Track.src;
         TrackAudio.currentTime = 0;
         TrackAudio.volume = 0;
+        TrackAudio.onended = null;
 
         FadeAudio(RomanticAudio, 0, Stage4Settings.TrackFadeOutMs, async () => {
             try {
                 await TrackAudio.play();
+
                 FadeAudio(TrackAudio, 0.9, Stage4Settings.TrackFadeInMs, () => {
                     TrackAudio.onended = () => {
                         FadeAudio(TrackAudio, 0, 600, () => {
@@ -179,15 +342,22 @@ async function PlayTrack(trackIndex) {
     }
 }
 
-function HandleTrackClick(event) {
-    const button = event.currentTarget;
-    const trackIndex = Number(button.dataset.track);
+function HandleTrackClick(Event) {
+    const Button = Event.currentTarget;
+    const TrackIndex = Number(Button.dataset.track);
 
-    if (Number.isNaN(trackIndex)) return;
-    PlayTrack(trackIndex);
+    if (Number.isNaN(TrackIndex)) return;
+    PlayTrack(TrackIndex);
 }
 
 function HandleStage4Click() {
+    if (IsTransitioning) return;
+
+    if (IsTypingCurrentSlide) {
+        SkipCurrentTyping();
+        return;
+    }
+
     if (CurrentSlideIndex < Stage4Slides.length - 1) {
         GoToNextSlide();
     }
@@ -197,21 +367,32 @@ function EnterStage4() {
     if (HasStage4Started) return;
     HasStage4Started = true;
 
+    InitializeTypewriterTargets();
+
     Stage4.classList.remove("StageHidden");
     Stage4.classList.add("StageVisible");
     Stage4.setAttribute("aria-hidden", "false");
 
+    window.requestAnimationFrame(() => {
+        Stage4.classList.add("Stage4Ready");
+    });
+
     StartCounterLoop();
-    PlayBackgroundMusic();
+    window.setTimeout(PlayBackgroundMusic, 250);
 
     Stage4.addEventListener("click", HandleStage4Click);
 
-    TrackButtons.forEach((button) => {
-        button.addEventListener("click", (event) => {
-            event.stopPropagation();
-            HandleTrackClick(event);
+    TrackButtons.forEach((Button) => {
+        Button.addEventListener("click", (Event) => {
+            Event.stopPropagation();
+            HandleTrackClick(Event);
         });
     });
+
+    ResetSlideForTyping(0);
+    window.setTimeout(() => {
+        TypeSlideContent(0);
+    }, 420);
 }
 
 window.EnterStage4 = EnterStage4;

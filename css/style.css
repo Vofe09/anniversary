@@ -717,3 +717,76 @@ body {
     opacity: 0.72;
     pointer-events: none;
 }
+
+#Stage4 {
+    opacity: 0;
+    transform: scale(0.985);
+    transition: opacity 780ms ease, transform 780ms ease;
+}
+
+#Stage4.StageVisible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+#Stage4.Stage4Ready .Stage4SlideActive {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.Stage4Slide {
+    z-index: 1;
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+    transition: opacity 560ms ease, transform 560ms ease;
+}
+
+.Stage4SlideActive {
+    z-index: 2;
+}
+
+.Stage4SlideExitLeft {
+    opacity: 0;
+    transform: translateX(-48px) scale(0.98);
+    pointer-events: none;
+}
+
+.Stage4SlideEnterRight {
+    opacity: 0;
+    transform: translateX(48px) scale(0.98);
+    pointer-events: none;
+}
+
+.Stage4Typewriter {
+    white-space: pre-wrap;
+}
+
+.Stage4Typing::after {
+    content: "▍";
+    margin-left: 2px;
+    animation: CaretBlink 0.9s step-end infinite;
+}
+
+.Stage4Typed::after {
+    content: "";
+}
+
+.Stage4Title {
+    min-height: 1.15em;
+}
+
+.Stage4Text {
+    min-height: 3.4em;
+}
+
+.Stage4Tracks {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 420ms ease, transform 420ms ease;
+}
+
+.Stage4TracksVisible {
+    opacity: 1;
+    transform: translateY(0);
+}
